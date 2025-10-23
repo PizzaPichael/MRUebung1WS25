@@ -1,0 +1,29 @@
+{
+  "name": "mruebung1ws25",
+  "version": "1.0.0",
+  "main": "service-worker.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PizzaPichael/MRUebung1WS25.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PizzaPichael/MRUebung1WS25/issues"
+  },
+  "homepage": "https://github.com/PizzaPichael/MRUebung1WS25#readme",
+  "description": "",
+  "devDependencies": {
+    "vite": "^7.1.12"
+  }
+}
