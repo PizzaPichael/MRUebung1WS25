@@ -97,9 +97,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       // XR globals.
       let xrButton = null;
-      let xrButtonAR = null;
       let xrImmersiveRefSpace = null;
       let xrInlineRefSpace = null;
+      let xrButtonAR = null;
 
       // WebGL scene globals.
       let gl = null;
@@ -107,8 +107,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let scene = new Scene();
       let solarSystem = new Gltf2Node({url: 'media/gltf/space/space.gltf'});
       scene.addNode(solarSystem);
-      let skyBox = new SkyboxNode({url: 'media/textures/milky-way-4k.png'});
-      scene.addNode(skyBox);
+      let skybox = new SkyboxNode({url: 'media/textures/milky-way-4k.png'});
+      scene.addNode(skybox);
+      let arStarted;
 
       function initXR() {
         console.log("Das ist ein Test");
@@ -152,6 +153,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // Set a flag on the session so we can differentiate it from the
           // inline session.
           session.isImmersive = true;
+          arStarted = false;
           onSessionStarted(session);
         });
       }
@@ -162,12 +164,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // Set a flag on the session so we can differentiate it from the
           // inline session.
           session.isImmersive = true;
+          arStarted = true;
           onSessionStarted(session);
         });
       }
 
       function onSessionStarted(session) {
         session.addEventListener('end', onSessionEnded);
+
+        if (session.isImmersive && arStarted) {
+          // When in 'immersive-ar' mode don't draw an opaque background because
+          // we want the real world to show through.
+          skybox.visible = false;
+        }
 
         if (!gl) {
           gl = createWebGLContext({
@@ -214,6 +223,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // which XRReferenceSpace is associated with which XRSession.
           if (session.isImmersive) {
             xrImmersiveRefSpace = refSpace;
+
+            xrImmersiveRefSpace.addEventListener('reset', (evt) => {
+            if (evt.transform) {
+              // AR experiences typically should stay grounded to the real world.
+              // If there's a known origin shift, compensate for it here.
+              xrImmersiveRefSpace = xrImmersiveRefSpace.getOffsetReferenceSpace(evt.transform);
+            }
+            });
           } else {
             xrInlineRefSpace = refSpace;
           }
